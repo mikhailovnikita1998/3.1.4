@@ -1,5 +1,6 @@
 package ru.kata.spring.boot_security.demo.model;
 
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,20 +12,19 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-
-//test
 @Entity
 @Table(name = "t_user")
 public class User implements UserDetails {
-    @Column
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column
     private int id;
 
     @Column(name = "name")
     private String firstName;
 
-    @Column (name = "surname")
+    @Column(name = "surname")
     private String lastName;
 
     @Column
@@ -33,37 +33,25 @@ public class User implements UserDetails {
     @Column
     private int age;
 
-    @Column (name = "username")
+    @Column(name = "username")
     private String email;
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    @ManyToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+    @JoinTable(name = "users_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles;
 
-    public void setEmail(String email) {
-        this.email = email;
+    public User() {
     }
 
     public User(String firstName, String lastName, String password, int age, String email) {
         this.firstName = firstName;
-        this.lastName  = lastName;
+        this.lastName = lastName;
         this.password = password;
-        this.email = email;
         this.age = age;
+        this.email = email;
     }
-
-
-    public User() {
-
-    }
-
-
-    @ManyToMany(cascade=CascadeType.REFRESH, fetch = FetchType.LAZY)
-    @JoinTable(name = "users_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles ;
-
 
     public int getId() {
         return id;
@@ -72,7 +60,6 @@ public class User implements UserDetails {
     public void setId(int id) {
         this.id = id;
     }
-
 
     public String getFirstName() {
         return firstName;
@@ -98,29 +85,6 @@ public class User implements UserDetails {
         this.roles = roles;
     }
 
-
-
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return id == user.id;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-@Transactional
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-       return roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.getName()))
-                .collect(Collectors.toList());
-    }
-
     public int getAge() {
         return age;
     }
@@ -131,6 +95,10 @@ public class User implements UserDetails {
 
     public String getEmail() {
         return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     @Override
@@ -162,7 +130,31 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-    public void addRole(Role roleUser) {
-        this.roles.add(roleUser);
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getAuthority()))
+                .collect(Collectors.toList());
+    }
+
+    public void addRole(Role role) {
+        this.roles.add(role);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return id == user.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    public void setPassword(String encode) {
     }
 }

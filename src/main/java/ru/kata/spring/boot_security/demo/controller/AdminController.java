@@ -14,8 +14,8 @@ import java.util.Set;
 
 @Controller
 public class AdminController {
-        private final UserService userService;
-        private final RoleService roleService;
+    private final UserService userService;
+    private final RoleService roleService;
 
 
     public AdminController(UserService userService, RoleService roleService) {
@@ -26,12 +26,12 @@ public class AdminController {
 
 
     @GetMapping("/users")
-    public String index(Model model , Principal principal) {
+    public String index(Model model, Principal principal) {
         User user = userService.getUserByUsername(principal.getName());
         model.addAttribute("user", user);
         model.addAttribute("users", userService.findAll());
         model.addAttribute("newUser", userService.createUser());
-        model.addAttribute("listRoles",roleService.getAllRoles());
+        model.addAttribute("listRoles", roleService.getAllRoles());
         return "testAdmin2";
     }
 
@@ -60,7 +60,7 @@ public class AdminController {
     @PutMapping("/users/{id}/edit")
     public String edit(Model model, @PathVariable("id") int id) {
         Set<Role> roles = roleService.getAllRoles();
-        model.addAttribute("user",userService.findById(id));
+        model.addAttribute("user", userService.findById(id));
         model.addAttribute("listRoles", roleService.getAllRoles());
         return "redirect:/users";
     }
@@ -80,7 +80,7 @@ public class AdminController {
 
     @PostMapping(("/users/new"))
     public String createUser(@ModelAttribute("newUser") User user, BindingResult bindingResult) {
-        if(bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             System.out.println("Binderr");
         }
         userService.add(user);

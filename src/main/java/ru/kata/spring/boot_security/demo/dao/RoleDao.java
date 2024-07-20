@@ -11,5 +11,5 @@ public interface RoleDao {
 
     Set<Role> getAllRoles();
 
-    public Set<Role> getRolesByName(Set<Role> roles);
+    Set<Role> getRolesByName(Set<Role> roles);
 }
